@@ -1,5 +1,6 @@
 
 `saccharina`; named for the Silverfish.
+===============
 
 This is a Python 3 binding for the National Library of Australia's
 Trove API. See this page for further information about the API:
@@ -38,4 +39,24 @@ List contributors:
 Detail on a particular contributor:
 
     contributors.py <api_key> <id>
+
+Programming notes
+========
+
+First call `saccharina.instance` with an API key. This will return a `Trove` instance.
+
+Each method on the `Trove` instance will return a class that is a pseudo-dictionary 
+representing some task you might perform, such as searching the archive. Set items 
+on this class instance to add extra form attributes to the request;
+
+    t = saccharina.instance(api_key)
+    searcher = t.searcher(zone, q)
+    searcher['reclevel'] = full
+
+The searcher method returns an iterable class instance which will progressively 
+return results. Be careful not to break Trove's API limits when using this.
+
+All the other methods return a callable class. Once you have been returned the 
+instance, set whatever items you need on it, and then call it `()` to be returned 
+the result of performing the API call.
 
