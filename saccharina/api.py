@@ -1,6 +1,9 @@
 
 import urllib.request, urllib.parse, json, copy
 
+class TroveException(Exception):
+    pass
+
 def instance(api_key):
     def json_helper(uri, values):
         values = copy.deepcopy(values)
@@ -11,9 +14,6 @@ def instance(api_key):
         handle = urllib.request.urlopen(req)
         result = handle.read()
         return json.loads(result.decode('utf8'))
-
-    class TroveException(Exception):
-        pass
 
     def set_self(self, d, ks, c=None):
         for k in ks:
