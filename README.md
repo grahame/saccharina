@@ -17,11 +17,11 @@ There are several example programs included;
 
 Query:
 
-    python3 search.py <api_key> <zone> <query>
+    search.py <api_key> <zone> <query>
 
 for example:
 
-    python3 search.py <api_key> newspaper 'harold holt'
+    search.py <api_key> newspaper 'harold holt'
 
 List newspapers:
 
