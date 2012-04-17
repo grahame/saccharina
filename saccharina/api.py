@@ -15,12 +15,13 @@ def instance(api_key):
         result = handle.read()
         return json.loads(result.decode('utf8'))
 
-    def set_self(self, d, ks, c=None):
-        for k in ks:
-            v = d[k]
-            if c is not None:
-                v=c(v)
-            setattr(self, k, v)
+    class Response:
+        def _set(self, d, *args, c=None):
+            for k in args:
+                v = d[k]
+                if c is not None:
+                    v=c(v)
+                setattr(self, k, v)
 
     class Record:
         def __init__(self, uri):
@@ -33,19 +34,19 @@ def instance(api_key):
         def __call__(self):
             return json_helper(self._uri, self._values)
 
-    class RecordResponse:
+    class RecordResponse(Response):
         def __init__(self, record_type, record):
             self._record = record
-            set_self(self, self._record, ('category', 'title', 'url', 'snippet', 'relevance', 'date', 'id'))
+            self._set(self._record, 'category', 'title', 'url', 'snippet', 'relevance', 'date', 'id')
 
         def get(self):
             return Record(self.url)
 
-    class ZoneResponse:
+    class ZoneResponse(Response):
         def __init__(self, zone):
             self._zone = zone
-            set_self(self, self._zone, ('name', 'records'))
-            set_self(self, self.records, ('n', 's', 'total'), c=int)
+            self._set(self._zone, 'name', 'records')
+            self._set(self.records, 'n', 's', 'total', c=int)
 
         def __repr__(self):
             return "%s(n=%d,s=%d,total=%d)" % (self.name, self.n, self.s, self.total)
@@ -59,10 +60,10 @@ def instance(api_key):
                         yield RecordResponse(k, v)
             return _iter()
 
-    class SearchResponse:
+    class SearchResponse(Response):
         def __init__(self, resp):
             self._resp = resp['response']
-            set_self(self, self._resp, ('query', 'zone'))
+            self._set(self._resp, 'query', 'zone')
 
         def __iter__(self):
             def _iter():
