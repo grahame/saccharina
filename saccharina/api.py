@@ -163,8 +163,6 @@ def instance(api_key):
     class Trove:
         def searcher(self, zone, q):
             values = {}
-            values['key'] = api_key
-            values['encoding'] = 'json'
             values['zone'] = zone
             values['q'] = q
             return PagedSearch(values)
