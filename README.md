@@ -7,7 +7,7 @@ http://trove.nla.gov.au/general/api-technical
 
 This software has no affiliation with the National Library of Australia.
 
-See the file 'LICENSE' for licensing and copyright information.
+See the file `LICENSE` for licensing and copyright information.
 
 There are several example programs included;
 
