@@ -51,7 +51,7 @@ on this class instance to add extra form attributes to the request;
 
     t = saccharina.instance(api_key)
     searcher = t.searcher(zone, q)
-    searcher['reclevel'] = full
+    searcher['reclevel'] = "full"
 
 The searcher method returns an iterable class instance which will progressively 
 return results. Be careful not to break Trove's API limits when using this.
