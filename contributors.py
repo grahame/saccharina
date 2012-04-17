@@ -12,5 +12,11 @@ if __name__ == "__main__":
     contributors = sys.argv[2:]
     t = saccharina.instance(api_key)
     if len(contributors) == 0:
-        for contributor in t.contributors():
-            print(contributor)
+        contribs = t.contributors()
+        for contrib, attrs in contribs():
+            pprint(attrs)
+    else:
+        for contributor_id in contributors:
+            contrib = t.contributor(contributor_id)
+            contrib['reclevel'] = 'full'
+            pprint(contrib())

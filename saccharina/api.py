@@ -92,6 +92,40 @@ def instance(api_key):
             res = json_helper(base_uri, values)
             return SearchResponse(res)
 
+    class Contributor:
+        def __init__(self, contributor_id):
+            self._id = contributor_id
+            self._uri = urllib.parse.urljoin('http://api.trove.nla.gov.au/contributor/', self._id)
+            self._values = {}
+
+        def __setitem__(self, k, v):
+            self._values[k] = v
+
+        def __call__(self):
+            return json_helper(self._uri, self._values)
+
+    class ContributorsList:
+        def __init__(self, _resp):
+            self._resp = _resp
+            self._contributors = self._resp['response']['contributor']
+
+        def __iter__(self):
+            def _iter():
+                for attrs in self._contributors:
+                    yield Contributor(attrs['id']), attrs
+            return _iter()
+
+    class Contributors:
+        def __init__(self):
+            self._uri = 'http://api.trove.nla.gov.au/contributor'
+            self._values = {}
+
+        def __setitem__(self, k, v):
+            self._values[k] = v
+
+        def __call__(self):
+            return ContributorsList(json_helper(self._uri, self._values))
+
     class NewspaperTitle:
         def __init__(self, paper_id):
             self._id = paper_id
@@ -104,27 +138,27 @@ def instance(api_key):
         def __call__(self):
             return json_helper(self._uri, self._values)
 
-    class Contributors:
-        def __init__(self):
-            self._uri = 'http://api.trove.nla.gov.au/contributor'
-            self._values = {}
-
-        def __setitem__(self, k, v):
-            self._values[k] = v
-
-        def __call__(self):
-            return json_helper(self._uri, self._values)
-
-    class NewspaperTitles:
-        def __init__(self):
-            self._titles = json_helper('http://api.trove.nla.gov.au/newspaper/titles', {})
-            self._titles = self._titles['response']['records']['newspaper']
+    class NewspaperTitlesList:
+        def __init__(self, _resp):
+            self._resp = _resp
+            self._titles = self._resp['response']['records']['newspaper']
 
         def __iter__(self):
             def _iter():
                 for attrs in self._titles:
                     yield NewspaperTitle(attrs['id']), attrs
             return _iter()
+
+    class NewspaperTitles:
+        def __init__(self):
+            self._uri = 'http://api.trove.nla.gov.au/newspaper/titles'
+            self._values = {}
+
+        def __setitem__(self, k, v):
+            self._values[k] = v
+
+        def __call__(self):
+            return NewspaperTitlesList(json_helper(self._uri, self._values))
 
     class Trove:
         def searcher(self, zone, q):
@@ -146,5 +180,8 @@ def instance(api_key):
         
         def contributors(self):
             return Contributors()
+
+        def contributor(self, contributor_id):
+            return Contributor(contributor_id)
 
     return Trove()

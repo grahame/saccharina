@@ -12,7 +12,8 @@ if __name__ == "__main__":
     titles = sys.argv[2:]
     t = saccharina.instance(api_key)
     if len(titles) == 0:
-        for title, attrs in t.newspaper_titles():
+        papers = t.newspaper_titles()
+        for title, attrs in papers():
             print("%s : %s : %s" % (attrs['id'], attrs['state'], attrs['title']))
     else:
         for title_id in titles:
