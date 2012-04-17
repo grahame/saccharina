@@ -3,7 +3,11 @@
 
 This is a Python 3 binding for the National Library of Australia's
 Trove API. See this page for further information about the API:
-http://trove.nla.gov.au/general/api-technical
+
+http://trove.nla.gov.au/general/api
+
+To use this software you'll need to get an API key from the Trove
+website.
 
 This software has no affiliation with the National Library of Australia.
 
