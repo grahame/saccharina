@@ -1,3 +1,3 @@
 
-from saccharina.api import instance
+from saccharina.api import instance, FileCache
 

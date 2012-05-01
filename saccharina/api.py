@@ -1,19 +1,59 @@
 
-import urllib.request, urllib.parse, json, copy
+import urllib.request, urllib.parse, json, copy, os
+from hashlib import sha256
+import pickle
 
 class TroveException(Exception):
     pass
 
-def instance(api_key):
-    def json_helper(uri, values):
+class FileCache:
+    def __init__(self, cache_dir):
+        self._cache_dir = cache_dir
+        self._hit = 0
+        self._miss = 0
+
+    def _fname(self, key):
+        h = sha256()
+        h.update(key.encode('utf8'))
+        return os.path.join(self._cache_dir, h.hexdigest())
+
+    def get(self, key):
+        try:
+            with open(self._fname(key), 'rb') as fd:
+                _key, s = pickle.load(fd)
+                assert(key == _key)
+                self._hit += 1
+                return s
+        except IOError:
+            self._miss += 1
+            return None
+
+    def set(self, key, s):
+        with open(self._fname(key), 'wb') as fd:
+            pickle.dump((key, s), fd)
+
+def instance(api_key, cache=None):
+    def api_call(uri, values):
         values = copy.deepcopy(values)
         values['key'] = api_key
         values['encoding'] = 'json'
         uri += '?' + urllib.parse.urlencode(values)
-        req = urllib.request.Request(uri)
-        handle = urllib.request.urlopen(req)
-        result = handle.read()
-        return json.loads(result.decode('utf8'))
+        def _make_call():
+            req = urllib.request.Request(uri)
+            handle = urllib.request.urlopen(req)
+            result = handle.read()
+            return result.decode('utf8')
+        def _wrap_cache():
+            if cache:
+                result = cache.get(uri)
+                if result is not None:
+                    return result
+            result = _make_call()
+            if cache:
+                cache.set(uri, result)
+            return result
+        result = _wrap_cache()
+        return json.loads(result)
 
     class Response:
         def _set(self, d, *args, c=None):
@@ -32,7 +72,7 @@ def instance(api_key):
             self._values[k] = v
 
         def __call__(self):
-            return json_helper(self._uri, self._values)
+            return api_call(self._uri, self._values)
 
     class RecordResponse(Response):
         def __init__(self, record_type, record):
@@ -40,6 +80,9 @@ def instance(api_key):
             self._set(self._record, 'category', 'title', 'url', 'snippet', 'relevance', 'date', 'id')
 
         def get(self):
+            return self._record
+
+        def get_record(self):
             return Record(self.url)
 
     class ZoneResponse(Response):
@@ -90,7 +133,7 @@ def instance(api_key):
             values['s'] = page * self._n
             values['n'] = str(self._n)
             base_uri = 'http://api.trove.nla.gov.au/result'
-            res = json_helper(base_uri, values)
+            res = api_call(base_uri, values)
             return SearchResponse(res)
 
     class Contributor:
@@ -103,7 +146,7 @@ def instance(api_key):
             self._values[k] = v
 
         def __call__(self):
-            return json_helper(self._uri, self._values)
+            return api_call(self._uri, self._values)
 
     class ContributorsList:
         def __init__(self, _resp):
@@ -125,7 +168,7 @@ def instance(api_key):
             self._values[k] = v
 
         def __call__(self):
-            return ContributorsList(json_helper(self._uri, self._values))
+            return ContributorsList(api_call(self._uri, self._values))
 
     class NewspaperTitle:
         def __init__(self, paper_id):
@@ -137,7 +180,7 @@ def instance(api_key):
             self._values[k] = v
 
         def __call__(self):
-            return json_helper(self._uri, self._values)
+            return api_call(self._uri, self._values)
 
     class NewspaperTitlesList:
         def __init__(self, _resp):
@@ -159,7 +202,7 @@ def instance(api_key):
             self._values[k] = v
 
         def __call__(self):
-            return NewspaperTitlesList(json_helper(self._uri, self._values))
+            return NewspaperTitlesList(api_call(self._uri, self._values))
 
     class Trove:
         def searcher(self, zone, q):

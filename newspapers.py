@@ -10,7 +10,7 @@ if __name__ == "__main__":
         sys.exit(1)
     api_key = sys.argv[1].strip()
     titles = sys.argv[2:]
-    t = saccharina.instance(api_key)
+    t = saccharina.instance(api_key, saccharina.FileCache('./cache'))
     if len(titles) == 0:
         papers = t.newspaper_titles()
         for title, attrs in papers():

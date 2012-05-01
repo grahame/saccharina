@@ -16,7 +16,7 @@ if __name__ == "__main__":
             print(record.date, record.relevance)
             print(record.snippet)
             print(record.url)
-            rec = record.get()
+            rec = record.get_record()
             rec['include'] = 'articletext'
             rec['reclevel'] = 'full'
             print(rec())
