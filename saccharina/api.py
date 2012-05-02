@@ -58,7 +58,7 @@ def instance(api_key, cache=None):
     class Response:
         def _set(self, d, *args, c=None):
             for k in args:
-                v = d[k]
+                v = d.get(k, None)
                 if c is not None:
                     v=c(v)
                 setattr(self, k, v)
