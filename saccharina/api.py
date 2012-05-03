@@ -1,5 +1,5 @@
 
-import urllib.request, urllib.parse, json, copy, os
+import urllib.request, urllib.parse, json, copy, os, time
 from hashlib import sha256
 import pickle
 
@@ -48,7 +48,14 @@ def instance(api_key, cache=None):
                 result = cache.get(uri)
                 if result is not None:
                     return result
-            result = _make_call()
+            while True:
+                try:
+                    result = _make_call()
+                except urllib.error.HTTPError as e:
+                    if e.code == 403:
+                        time.sleep(1)
+                        continue
+                break
             if cache:
                 cache.set(uri, result)
             return result
