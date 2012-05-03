@@ -6,7 +6,7 @@ from pprint import pprint
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:
-        print("usage: %s <api_key> <zone> <query>" % sys.argv[0], file=sys.stderr)
+        print("usage: %s <api_key> <zone> <query> .." % sys.argv[0], file=sys.stderr)
         sys.exit(1)
     api_key, zone = [t.strip() for t in sys.argv[1:3]]
     queries = [t.strip() for t in sys.argv[3:]]
