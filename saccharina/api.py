@@ -9,6 +9,9 @@ class TroveException(Exception):
 class FileCache:
     def __init__(self, cache_dir):
         self._cache_dir = cache_dir
+        if not os.access(self._cache_dir, os.W_OK):
+            try: os.mkdir(self._cache_dir)
+            except OSError: pass
         self._hit = 0
         self._miss = 0
 
