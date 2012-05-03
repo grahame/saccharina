@@ -37,10 +37,10 @@ if __name__ == "__main__":
             def get_total(query):
                 page = mk(query)[0]
                 return [zone for zone in page][0].total
-            yield [year, month, get_total(None)] + [get_total(t) for t in queries]
+            yield ["%.2d/%d" % (month, year), get_total(None)] + [get_total(t) for t in queries]
 
     import csv
     writer = csv.writer(sys.stdout)
-    writer.writerow(["year", "month", "total"] + queries)
+    writer.writerow(["month", "total"] + queries)
     for row in histo_iter():
         writer.writerow(row)
