@@ -5,7 +5,7 @@
 This is a Python 3 binding for the National Library of Australia's
 Trove API. See this page for further information about the API:
 
-http://trove.nla.gov.au/general/api
+http://help.nla.gov.au/trove/building-with-trove/api
 
 To use this software you'll need to get an API key from the Trove
 website.
